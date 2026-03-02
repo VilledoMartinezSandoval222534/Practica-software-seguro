@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="dashboard-header p-4 mb-4"> 
+    <div class="container d-flex justify-content-between align-items-center"> 
+        <div class="text-white"> 
+            <h2 class="mb-0">Lista de contactos</h2> 
+        </div> 
+        <div> 
+            <button type="button" class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#contactoModal">
+                + Nuevo Contacto
+            </button>
+            <a href="{% url 'logout' %}" class="btn btn-danger me-2">Cerrar Sesión</a>
+        </div> 
+    </div> 
+</div>
+
+<div class="container">
+    <div class="card shadow-lg border-0 p-4">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr class="text-center">
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Nota</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contacto in contactos %}
+                    <tr class="text-center">
+                        <td><strong>{{ contacto.nombre }}</strong></td>
+                        <td>{{ contacto.email }}</td>
+                        <td>{{ contacto.telefono }}</td>
+                        <td>{{ contacto.Nota }}</td>
+                        <td>
+                            <!-- Botón Editar -->
+                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="modal" data-bs-target="#editarModal{{ contacto.id }}">
+                                Editar
+                            </button>
+
+                            <a href="{% url 'eliminar' contacto.id %}" class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('¿Estás seguro de eliminar este contacto?');">
+                                Eliminar
+                            </a>
+                        </td>
+                    </tr>
+
+                    <div class="modal fade" id="editarModal{{ contacto.id }}" tabindex="-1" aria-labelledby="editarModalLabel{{ contacto.id }}" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header border-0">
+                            <h5 class="modal-title" id="editarModalLabel{{ contacto.id }}">Editar Contacto</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                          </div>
+                          <div class="modal-body p-4">
+                            <form method="POST" action="{% url 'editar' contacto.id %}">
+                              {% csrf_token %}
+                              <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" name="nombre" value="{{ contacto.nombre }}" class="form-control" required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" name="telefono" value="{{ contacto.telefono }}" class="form-control" required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" value="{{ contacto.email }}" class="form-control" required>
+                              </div>
+
+                              <div class="mb-3">
+                                <label class="form-label">Nota</label>
+                                <textarea name="Nota" class="form-control" rows="3">{{ contacto.Nota }}</textarea>
+                              </div>
+
+                              <button type="submit" class="btn btn-success w-100 mt-3">Guardar cambios</button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No hay contactos registrados
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="contactoModal" tabindex="-1" aria-labelledby="contactoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="contactoModalLabel">Nuevo Contacto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST" id="modalForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        {{ form.nombre }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Teléfono</label>
+                        {{ form.telefono }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nota</label>
+                        {{ form.Nota }}
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 mt-3">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
